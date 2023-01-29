@@ -13,42 +13,42 @@
 // Register custom post type 'peacock_slider'
 function peacock_slider_post_type() {
     $labels = array(
-      'name'               => _x( 'Peacock Sliders', 'post type general name', 'peacock-slider' ),
-      'singular_name'      => _x( 'Peacock Slider', 'post type singular name', 'peacock-slider' ),
-      'menu_name'          => _x( 'Peacock Sliders', 'admin menu', 'peacock-slider' ),
-      'name_admin_bar'     => _x( 'Peacock Slider', 'add new on admin bar', 'peacock-slider' ),
-      'add_new'            => _x( 'Add New', 'peacock slider', 'peacock-slider' ),
-      'add_new_item'       => __( 'Add New Peacock Slider', 'peacock-slider' ),
-      'new_item'           => __( 'New Peacock Slider', 'peacock-slider' ),
-      'edit_item'          => __( 'Edit Peacock Slider', 'peacock-slider' ),
-      'view_item'          => __( 'View Peacock Slider', 'peacock-slider' ),
-      'all_items'          => __( 'All Peacock Sliders', 'peacock-slider' ),
-      'search_items'       => __( 'Search Peacock Sliders', 'peacock-slider' ),
-      'parent_item_colon'  => __( 'Parent Peacock Sliders:', 'peacock-slider' ),
-      'not_found'          => __( 'No peacock sliders found.', 'peacock-slider' ),
-      'not_found_in_trash' => __( 'No peacock sliders found in Trash.', 'peacock-slider' )
+      'name' => 'Peacock Sliders',
+      'singular_name' => 'Peacock Slider',
+      'add_new' => 'Add New',
+      'add_new_item' => 'Add New Slider',
+      'edit_item' => 'Edit Slider',
+      'new_item' => 'New Slider',
+      'all_items' => 'All Sliders',
+      'view_item' => 'View Slider',
+      'search_items' => 'Search Sliders',
+      'not_found' =>  'No Sliders found',
+      'not_found_in_trash' => 'No Sliders found in Trash',
+      'parent_item_colon' => '',
+      'menu_name' => 'Peacock Sliders'
     );
-  
+         
     $args = array(
-      'labels'             => $labels,
-      'description'        => __( 'Description.', 'peacock-slider' ),
-      'public'             => true,
+      'labels' => $labels,
+      'public' => true,
       'publicly_queryable' => true,
-      'show_ui'            => true,
-      'show_in_menu'       => true,
-      'query_var'          => true,
-      'rewrite'            => array( 'slug' => 'peacock-slider' ),
-      'capability_type'    => 'post',
-      'has_archive'        => true,
-      'hierarchical'       => false,
-      'menu_position'      => null,
-      'supports'           => array( 'title', 'editor', 'thumbnail' ),
-      'taxonomies'         => array( 'peacock_slider_category' )
+      'show_ui' => true,
+      'show_in_menu' => true,
+      'query_var' => true,
+      'rewrite' => array( 'slug' => 'peacock-slider' ),
+      'capability_type' => 'post',
+      'has_archive' => true,
+      'hierarchical' => false,
+      'menu_position' => null,
+      'menu_icon' => 'dashicons-images-alt2',
+      'supports' => array( 'title', 'editor', 'thumbnail' ),
+      'taxonomies' => array( 'peacock_slider_category' )
     );
-  
+    
     register_post_type( 'peacock_slider', $args );
 }
-
+add_action( 'init', 'peacock_slider_post_type' );
+  
 function peacock_slider_category() {
     $labels = array(
       'name'              => _x( 'Peacock Slider Categories', 'taxonomy general name', 'peacock-slider' ),
@@ -75,65 +75,77 @@ function peacock_slider_category() {
   
     register_taxonomy( 'peacock_slider_category', array( 'peacock_slider' ), $args );
 }
+  
 
-function peacock_slider_meta_box() {
-    add_meta_box(
-      'peacock_slider_meta_box',
-      __( 'Peacock Slider Options', 'peacock-slider' ),
-      'peacock_slider_meta_box_callback',
-      'peacock_slider',
-      'normal',
-      'default'
-    );
+
+function peacock_slider_add_meta_boxes() {
+      add_meta_box(
+        'peacock_slider_image',
+        'Slider Image',
+        'peacock_slider_image_callback',
+        'peacock_slider',
+        'normal',
+        'default'
+      );
+      add_meta_box(
+        'peacock_slider_header',
+        'Slider Header',
+        'peacock_slider_header_callback',
+        'peacock_slider',
+        'normal',
+        'default'
+      );
 }
-
-function peacock_slider_meta_box_callback( $post ) {
-    wp_nonce_field( basename( __FILE__ ), 'peacock_slider_nonce' );
-    $peacock_slider_stored_meta = get_post_meta( $post->ID );
-    ?>
-    <div>
-      <div class="form-group">
-        <label for="header"><?php _e( 'Header', 'peacock-slider' )?></label>
-        <input type="text" name="header" id="header" value="<?php if ( isset ( $peacock_slider_stored_meta['header'] ) ) echo $peacock_slider_stored_meta['header'][0]; ?>" />
-      </div>
-      <div class="form-group">
-        <label for="image"><?php _e( 'Image', 'peacock-slider' )?></label>
-        <input type="text" name="image" id="image" value="<?php if ( isset ( $peacock_slider_stored_meta['image'] ) ) echo $peacock_slider_stored_meta['image'][0]; ?>" />
-        <input type="button" id="image-button" class="button" value="<?php _e( 'Choose or Upload an Image', 'peacock-slider' )?>" />
-      </div>
-    </div>
-    <?php
+add_action( 'add_meta_boxes', 'peacock_slider_add_meta_boxes' );
+    
+function peacock_slider_image_callback( $post ) {
+      wp_nonce_field( basename( __FILE__ ), 'peacock_slider_nonce' );
+      $peacock_slider_stored_meta = get_post_meta( $post->ID );
+      ?>
+      <p>
+        <label for="peacock-slider-image" class="peacock-slider-row-title">Image</label>
+        <input type="text" name="peacock-slider-image" id="peacock-slider-image" value="<?php if ( isset ( $peacock_slider_stored_meta['peacock-slider-image'] ) ) echo $peacock_slider_stored_meta['peacock-slider-image'][0]; ?>" />
+      </p>
+      <?php
 }
-
+    
+function peacock_slider_header_callback( $post ) {
+      wp_nonce_field( basename( __FILE__ ), 'peacock_slider_nonce' );
+      $peacock_slider_stored_meta = get_post_meta( $post->ID );
+      ?>
+      <p>
+        <label for="peacock-slider-header" class="peacock-slider-row-title">Header</label>
+        <input type="text" name="peacock-slider-header" id="peacock-slider-header" value="<?php if ( isset ( $peacock_slider_stored_meta['peacock-slider-header'] ) ) echo $peacock_slider_stored_meta['peacock-slider-header'][0]; ?>" />
+      </p>
+      <?php
+}
+  
 function peacock_slider_meta_save( $post_id ) {
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-      return;
-    }
-  
-    if ( ! isset( $_POST['peacock_slider_meta_nonce'] ) || ! wp_verify_nonce( $_POST['peacock_slider_meta_nonce'], 'peacock_slider_save_meta_data' ) ) {
-      return;
-    }
-  
-    if ( ! current_user_can( 'edit_post', $post_id ) ) {
-      return;
-    }
-  
-    if ( isset( $_POST['peacock_slider_header'] ) ) {
-      update_post_meta( $post_id, 'peacock_slider_header', sanitize_text_field( $_POST['peacock_slider_header'] ) );
-    }
-  
-    if ( isset( $_POST['peacock_slider_image'] ) ) {
-      update_post_meta( $post_id, 'peacock_slider_image', intval( $_POST['peacock_slider_image'] ) );
-    }
-}
-
-function peacock_slider_enqueue(){
+      // verify nonce
+      if ( !isset( $_POST['peacock_slider_nonce'] ) || !wp_verify_nonce( $_POST['peacock_slider_nonce'], basename( __FILE__ ) ) ) {
+        return;
+      }
     
-}
-
-function peacock_slider_shortcode(){
+      // check autosave
+      if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+      }
     
+      // check permissions
+      if ( !current_user_can( 'edit_post', $post_id ) ) {
+        return;
+      }
+    
+      // save data
+      if ( isset( $_POST['peacock-slider-image'] ) ) {
+        update_post_meta( $post_id, 'peacock-slider-image', sanitize_text_field( $_POST['peacock-slider-image'] ) );
+      }
+      if ( isset( $_POST['peacock-slider-header'] ) ) {
+        update_post_meta( $post_id, 'peacock-slider-header', sanitize_text_field( $_POST['peacock-slider-header'] ) );
+      }
 }
+add_action( 'save_post', 'peacock_slider_meta_save' );
+
 
 // Activation function
 function peacock_slider_activate() {
@@ -148,3 +160,4 @@ function peacock_slider_deactivate() {
     flush_rewrite_rules();
 }
 register_deactivation_hook(__FILE__, 'peacock_slider_deactivate');
+    
